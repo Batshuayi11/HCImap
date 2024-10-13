@@ -18,58 +18,40 @@
     <!-- Basic styling for the map and directions -->
     <style>
         body {
-            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 428px;
             margin: 0;
-            padding: 0;
         }
 
         #map {
             height: 778px; /* Full height initially */
-            width: 428px; /* Full width */
-            transition: height 0.3s ease; /* Smooth transition */
+            width: 100%;
+            display: none; /* Hide the map initially */
         }
 
         #directions {
-            height: 0; /* Hidden initially */
-            overflow: hidden; /* Prevent overflow */
-            width: 428px; /* Full width */
-            transition: height 0.3s ease; /* Smooth transition */
-        }
-
-        #container {
-            width: 428px;
-            margin: 0 auto; /* Center the container */
-        }
-
-        /* Input fields styling */
-        #inputContainer {
-            display: flex;
-            flex-direction: column;
+            display: none; /* Hide the directions initially */
+            width: 100%;
+            border: 1px solid #ccc;
             padding: 10px;
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 1000; /* Ensure input fields are above the map */
-            background-color: white; /* Background for visibility */
+            box-sizing: border-box;
         }
     </style>
 </head>
 <body>
 
     <!-- Input fields for "From" and "To" locations -->
-    <div id="inputContainer">
-        <input type="text" id="fromInput" placeholder="From location" />
-        <input type="text" id="toInput" placeholder="To location" />
-        <button id="submitButton">Get Directions</button>
-    </div>
+    <input type="text" id="fromInput" placeholder="From location" />
+    <input type="text" id="toInput" placeholder="To location" />
+    <button id="submitButton">Get Directions</button>
 
-    <!-- Container for map and directions -->
-    <div id="container">
-        <!-- Map container -->
-        <div id="map"></div>
-        <!-- Directions container -->
-        <div id="directions"></div>
-    </div>
+    <!-- Map container -->
+    <div id="map"></div>
+
+    <!-- Directions container -->
+    <div id="directions"></div>
 
     <script>
         // Initialize the map
@@ -85,13 +67,13 @@
         var routingControl = L.Routing.control({
             waypoints: [],
             routeWhileDragging: true,
-            geocoder: L.Control.Geocoder.nominatim(),
+            geocoder: L.Control.Geocoder.nominatim(),  // Ensure geocoding is linked to routing
             createMarker: function(i, wp) {
                 return L.marker(wp.latLng, { draggable: true });
             }
         }).addTo(map);
 
-        // Geocoding function
+        // Geocoding function (using Leaflet Control Geocoder)
         function geocode(address, callback) {
             var geocoder = L.Control.Geocoder.nominatim(); // Ensure proper geocoder
             geocoder.geocode(address, function(results) {
@@ -109,6 +91,10 @@
             var toAddress = document.getElementById('toInput').value;
 
             if (fromAddress && toAddress) {
+                // Show the map and hide the directions initially
+                document.getElementById('map').style.display = 'block';
+                document.getElementById('directions').style.display = 'none';
+
                 // Geocode both addresses
                 geocode(fromAddress, function(fromLocation) {
                     geocode(toAddress, function(toLocation) {
@@ -118,16 +104,23 @@
                             L.latLng(toLocation.lat, toLocation.lng)
                         ]);
 
-                        // Set map height to 50% and show directions
-                        document.getElementById('map').style.height = '389px'; // 50% of 778px
-                        document.getElementById('directions').style.height = '389px'; // 50% of 778px
-                        document.getElementById('directions').innerHTML = '<h3>Directions</h3>';
+                        // After setting waypoints, display the directions
                         routingControl.on('routesfound', function(e) {
                             var routes = e.routes;
                             var summary = routes[0].summary;
-                            document.getElementById('directions').innerHTML += 
-                                `<p>Distance: ${summary.totalDistance} meters</p>` +
-                                `<p>Time: ${summary.totalTime} seconds</p>`;
+
+                            // Set directions content
+                            var directionsDiv = document.getElementById('directions');
+                            directionsDiv.innerHTML = `
+                                <h3>Directions</h3>
+                                <p>Distance: ${summary.totalDistance} meters</p>
+                                <p>Time: ${summary.totalTime} seconds</p>
+                            `;
+
+                            // Show the directions and adjust map height
+                            directionsDiv.style.display = 'block';
+                            document.getElementById('map').style.height = '50%'; // Set map to half height
+                            directionsDiv.style.height = '50%'; // Set directions to half height
                         });
                     });
                 });
