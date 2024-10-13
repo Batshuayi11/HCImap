@@ -15,65 +15,44 @@
     <!-- Leaflet Control Geocoder (for geocoding locations) -->
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-    <!-- Basic styling for the map -->
+    <!-- Basic styling for the map and directions -->
     <style>
-        body {
+        body, html {
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+            padding: 0;
+            height: 100%;
+            width: 100%;
         }
-
-        /* Styling for the map container */
+        #container {
+            width: 100%;
+            height: 100%;
+        }
         #map {
-            width: 428px;
-            height: 778px;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            margin: auto;
+            height: 100%;
+            width: 100%;
+            transition: height 0.3s ease;
         }
-
-        /* Input and button positioning */
-        .input-container {
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        input, button {
-            margin: 5px;
-            padding: 10px;
-            width: 300px;
-            font-size: 16px;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
+        #directions {
+            display: none;
+            height: 50%;
+            overflow-y: auto;
+            background: #f9f9f9;
+            border-top: 1px solid #ccc;
         }
     </style>
 </head>
 <body>
 
     <!-- Input fields for "From" and "To" locations -->
-    <div class="input-container">
-        <input type="text" id="fromInput" placeholder="From location" />
-        <input type="text" id="toInput" placeholder="To location" />
-        <button id="submitButton">Get Directions</button>
-    </div>
+    <input type="text" id="fromInput" placeholder="From location" />
+    <input type="text" id="toInput" placeholder="To location" />
+    <button id="submitButton">Get Directions</button>
 
-    <!-- Map container -->
-    <div id="map"></div>
+    <!-- Container for the map and directions -->
+    <div id="container">
+        <div id="map"></div>
+        <div id="directions"></div>
+    </div>
 
     <script>
         // Initialize the map
@@ -92,8 +71,19 @@
             geocoder: L.Control.Geocoder.nominatim(),  // Ensure geocoding is linked to routing
             createMarker: function(i, wp) {
                 return L.marker(wp.latLng, { draggable: true });
-            }
-        }).addTo(map);
+            },
+            lineOptions: {
+                styles: [{ color: '#6FA1EC', weight: 4 }]
+            },
+            showAlternatives: true,
+            altLineOptions: {
+                styles: [{ color: '#9D9D9D', weight: 4 }]
+            },
+            // Directions container
+            containerClassName: 'leaflet-routing-container'
+        });
+
+        routingControl.addTo(map);
 
         // Geocoding function (using Leaflet Control Geocoder)
         function geocode(address, callback) {
@@ -121,6 +111,10 @@
                             L.latLng(fromLocation.lat, fromLocation.lng),
                             L.latLng(toLocation.lat, toLocation.lng)
                         ]);
+
+                        // Adjust the layout to show directions at the bottom
+                        document.getElementById('map').style.height = "50%";
+                        document.getElementById('directions').style.display = "block";
                     });
                 });
             } else {
