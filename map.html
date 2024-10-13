@@ -12,7 +12,8 @@
     <!-- Leaflet Routing Machine -->
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 
-    <!-- Leaflet Control Geocoder (for geocoding locations) -->
+    <!-- Leaflet Control Geocoder -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <!-- Basic styling for the map -->
@@ -43,24 +44,21 @@
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        // Routing control (initial, empty)
+        // Initialize the routing control
         var routingControl = L.Routing.control({
-            waypoints: [],
-            routeWhileDragging: true,
-            geocoder: L.Control.Geocoder.nominatim(),  // Ensure geocoding is linked to routing
-            createMarker: function(i, wp) {
-                return L.marker(wp.latLng, { draggable: true });
-            }
+            routeWhileDragging: true
         }).addTo(map);
 
-        // Geocoding function (using Leaflet Control Geocoder)
+        // Initialize the geocoder
+        var geocoder = L.Control.Geocoder.nominatim();
+
+        // Geocode function
         function geocode(address, callback) {
-            var geocoder = L.Control.Geocoder.nominatim(); // Ensure proper geocoder
             geocoder.geocode(address, function(results) {
                 if (results && results.length > 0) {
-                    callback(results[0].center);
+                    callback(null, results[0].center);
                 } else {
-                    alert("Location not found: " + address);
+                    callback(new Error("Location not found: " + address));
                 }
             });
         }
@@ -71,10 +69,16 @@
             var toAddress = document.getElementById('toInput').value;
 
             if (fromAddress && toAddress) {
-                // Geocode both addresses
-                geocode(fromAddress, function(fromLocation) {
-                    geocode(toAddress, function(toLocation) {
-                        // Set waypoints in the routing control
+                geocode(fromAddress, function(err, fromLocation) {
+                    if (err) {
+                        alert(err.message);
+                        return;
+                    }
+                    geocode(toAddress, function(err, toLocation) {
+                        if (err) {
+                            alert(err.message);
+                            return;
+                        }
                         routingControl.setWaypoints([
                             L.latLng(fromLocation.lat, fromLocation.lng),
                             L.latLng(toLocation.lat, toLocation.lng)
