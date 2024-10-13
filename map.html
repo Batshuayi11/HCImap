@@ -12,6 +12,9 @@
     <!-- Leaflet Routing Machine -->
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 
+    <!-- Leaflet Control Geocoder (for geocoding locations) -->
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
     <!-- Basic styling for the map -->
     <style>
         #map {
@@ -43,12 +46,16 @@
         // Routing control (initial, empty)
         var routingControl = L.Routing.control({
             waypoints: [],
-            routeWhileDragging: true
+            routeWhileDragging: true,
+            geocoder: L.Control.Geocoder.nominatim(),  // Ensure geocoding is linked to routing
+            createMarker: function(i, wp) {
+                return L.marker(wp.latLng, { draggable: true });
+            }
         }).addTo(map);
 
-        // Dummy geocoding function (you can use real geocoding APIs)
+        // Geocoding function (using Leaflet Control Geocoder)
         function geocode(address, callback) {
-            var geocoder = new L.Control.Geocoder.Nominatim();
+            var geocoder = L.Control.Geocoder.nominatim(); // Ensure proper geocoder
             geocoder.geocode(address, function(results) {
                 if (results && results.length > 0) {
                     callback(results[0].center);
@@ -64,8 +71,10 @@
             var toAddress = document.getElementById('toInput').value;
 
             if (fromAddress && toAddress) {
+                // Geocode both addresses
                 geocode(fromAddress, function(fromLocation) {
                     geocode(toAddress, function(toLocation) {
+                        // Set waypoints in the routing control
                         routingControl.setWaypoints([
                             L.latLng(fromLocation.lat, fromLocation.lng),
                             L.latLng(toLocation.lat, toLocation.lng)
