@@ -15,28 +15,11 @@
     <!-- Leaflet Control Geocoder (for geocoding locations) -->
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-    <!-- Basic styling for the map and directions -->
+    <!-- Basic styling for the map -->
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 428px;
-            margin: 0;
-        }
-
         #map {
-            height: 778px; /* Full height initially */
+            height: 400px;
             width: 100%;
-            display: none; /* Hide the map initially */
-        }
-
-        #directions {
-            display: none; /* Hide the directions initially */
-            width: 100%;
-            border: 1px solid #ccc;
-            padding: 10px;
-            box-sizing: border-box;
         }
     </style>
 </head>
@@ -49,9 +32,6 @@
 
     <!-- Map container -->
     <div id="map"></div>
-
-    <!-- Directions container -->
-    <div id="directions"></div>
 
     <script>
         // Initialize the map
@@ -91,10 +71,6 @@
             var toAddress = document.getElementById('toInput').value;
 
             if (fromAddress && toAddress) {
-                // Show the map and hide the directions initially
-                document.getElementById('map').style.display = 'block';
-                document.getElementById('directions').style.display = 'none';
-
                 // Geocode both addresses
                 geocode(fromAddress, function(fromLocation) {
                     geocode(toAddress, function(toLocation) {
@@ -103,25 +79,6 @@
                             L.latLng(fromLocation.lat, fromLocation.lng),
                             L.latLng(toLocation.lat, toLocation.lng)
                         ]);
-
-                        // After setting waypoints, display the directions
-                        routingControl.on('routesfound', function(e) {
-                            var routes = e.routes;
-                            var summary = routes[0].summary;
-
-                            // Set directions content
-                            var directionsDiv = document.getElementById('directions');
-                            directionsDiv.innerHTML = `
-                                <h3>Directions</h3>
-                                <p>Distance: ${summary.totalDistance} meters</p>
-                                <p>Time: ${summary.totalTime} seconds</p>
-                            `;
-
-                            // Show the directions and adjust map height
-                            directionsDiv.style.display = 'block';
-                            document.getElementById('map').style.height = '50%'; // Set map to half height
-                            directionsDiv.style.height = '50%'; // Set directions to half height
-                        });
                     });
                 });
             } else {
