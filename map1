@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>OpenStreetMap Directions</title>
+
+    <!-- Leaflet CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Leaflet Routing Machine -->
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+    <!-- Leaflet Control Geocoder -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+    <!-- Basic styling for the map -->
+    <style>
+        #map {
+            height: 770px;
+            width: 100%;
+        
+    </style>
+</head>
+<body>
+
+    <div class="mapcontain">
+    <!-- Input fields for "From" and "To" locations -->
+    <input type="text" id="fromInput" placeholder="From location" />
+    <input type="text" id="toInput" placeholder="To location" />
+    <button id="submitButton">Get Directions</button>
+    </div>
+
+    <!-- Map container -->
+    <div id="map"></div>
+
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([-13.2543, 34.3015], 7); // Center Malawi
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Initialize the routing control
+        var routingControl = L.Routing.control({
+            routeWhileDragging: true
+        }).addTo(map);
+
+        // Initialize the geocoder
+        var geocoder = L.Control.Geocoder.nominatim();
+
+        // Geocode function
+        function geocode(address, callback) {
+            geocoder.geocode(address, function(results) {
+                if (results && results.length > 0) {
+                    callback(null, results[0].center);
+                } else {
+                    callback(new Error("Location not found: " + address));
+                }
+            });
+        }
+
+        // Event listener for the button
+        document.getElementById('submitButton').addEventListener('click', function() {
+            var fromAddress = document.getElementById('fromInput').value;
+            var toAddress = document.getElementById('toInput').value;
+
+            if (fromAddress && toAddress) {
+                geocode(fromAddress, function(err, fromLocation) {
+                    if (err) {
+                        alert(err.message);
+                        return;
+                    }
+                    geocode(toAddress, function(err, toLocation) {
+                        if (err) {
+                            alert(err.message);
+                            return;
+                        }
+                        routingControl.setWaypoints([
+                            L.latLng(fromLocation.lat, fromLocation.lng),
+                            L.latLng(toLocation.lat, toLocation.lng)
+                        ]);
+                    });
+                });
+            } else {
+                alert('Please enter both From and To locations.');
+            }
+        });
+    </script>
+</body>
+</html>
