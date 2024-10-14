@@ -21,18 +21,21 @@
         #map {
             height: 770px;
             width: 100%;
-        #fromInput {
+        .mapcontain {
             font-family: "Times New Roman", Times, serif;
             font size: 20px;
+            color: red;
         }
     </style>
 </head>
 <body>
 
+    <div class="mapcontain">
     <!-- Input fields for "From" and "To" locations -->
     <input type="text" id="fromInput" placeholder="From location" />
     <input type="text" id="toInput" placeholder="To location" />
     <button id="submitButton">Get Directions</button>
+    </div>
 
     <!-- Map container -->
     <div id="map"></div>
