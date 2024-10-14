@@ -16,37 +16,37 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-    <!-- Basic styling for the map and inputs -->
+    <!-- Basic styling for the map -->
     <style>
         #map {
             height: 770px;
             width: 100%;
         }
 
-        /* Style for input fields */
+        /* Styling input fields */
         input[type="text"] {
-            font-family: "Times New Roman", Times, serif;
-            font-size: 12px;
+            font-family: 'Times New Roman', Times, serif;
+            font-weight: bold;
             color: black;
-            padding: 5px;
-            margin: 5px;
-            border: 1px solid #ccc;
+            font-size: 12px;
         }
 
+        /* Button styling (optional) */
         button {
-            font-family: "Times New Roman", Times, serif;
+            font-family: 'Times New Roman', Times, serif;
+            font-weight: bold;
+            color: black;
             font-size: 12px;
-            padding: 5px 10px;
         }
     </style>
 </head>
 <body>
 
     <div class="mapcontain">
-    <!-- Input fields for "From" and "To" locations -->
-    <input type="text" id="fromInput" placeholder="From location" />
-    <input type="text" id="toInput" placeholder="To location" />
-    <button id="submitButton">Get Directions</button>
+        <!-- Input fields for "From" and "To" locations -->
+        <input type="text" id="fromInput" placeholder="From location" />
+        <input type="text" id="toInput" placeholder="To location" />
+        <button id="submitButton">Get Directions</button>
     </div>
 
     <!-- Map container -->
